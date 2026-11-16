@@ -1,10 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform, useInView, AnimatePresence, useReducedMotion } from 'motion/react';
 import { 
   Flower2, Waves, Circle, Feather, ArrowRight, Sparkles, Volume2, Droplet, ChevronLeft, ChevronRight, Globe,
   X, Play, CheckCircle2, ExternalLink
 } from 'lucide-react';
-import pillarImg from '/pillar.jpeg';
 import anandImg from '/anand.jpeg';
 
 /* --- UTILS --- */
@@ -91,6 +90,64 @@ const MARQUEE_TEXT = [
   'BHAKTI SADHANA'
 ];
 
+interface HeroSlide {
+  id: string;
+  image: string;
+  alt: string;
+  objectPosition: string;
+  headlineTop: string;
+  headlineAccent: string;
+  subheadline: string;
+}
+
+const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: "hero-1",
+    image: `${import.meta.env.BASE_URL}hero-1.jpg`,
+    alt: "Artist playing tanpura in a serene traditional courtyard illuminated by a brass oil lamp",
+    objectPosition: "72% center",
+    headlineTop: "Sacred Chants &",
+    headlineAccent: "Classical Music",
+    subheadline: "Guided masterclasses for inner stillness",
+  },
+  {
+    id: "hero-2",
+    image: `${import.meta.env.BASE_URL}hero2.jpg`,
+    alt: "Seekers sitting in meditative prayer around a lit brass lamp and incense in a pillared courtyard",
+    objectPosition: "68% center",
+    headlineTop: "A Living Practice",
+    headlineAccent: "Of Shared Devotion",
+    subheadline: "Timeless chants practiced together in stillness",
+  },
+  {
+    id: "hero-3",
+    image: `${import.meta.env.BASE_URL}hero-3.jpg`,
+    alt: "Traditional wooden tanpura resting beside carved stone temple pillars and a glowing oil lamp",
+    objectPosition: "65% center",
+    headlineTop: "Sound as a Doorway",
+    headlineAccent: "To Inner Balance",
+    subheadline: "Rooted in classical lineage and pure resonance",
+  },
+  {
+    id: "hero-4",
+    image: `${import.meta.env.BASE_URL}hero-4.jpg`,
+    alt: "Practitioner following a guided online session from home beside warm brass oil lamps",
+    objectPosition: "68% center",
+    headlineTop: "Bring Ancient Chants",
+    headlineAccent: "Into Your Daily Life",
+    subheadline: "Guided online sessions from the comfort of home",
+  },
+  {
+    id: "hero-5",
+    image: `${import.meta.env.BASE_URL}hero-5.jpg`,
+    alt: "Devoted classical vocalist chanting beside an ancient temple pillar and brass lamp",
+    objectPosition: "72% center",
+    headlineTop: "Pure Transmission",
+    headlineAccent: "Through Sacred Voice",
+    subheadline: "Learn authentic pronunciation, melody, and depth",
+  },
+];
+
 interface OfferingProgram {
   id: string;
   image: string;
@@ -106,34 +163,14 @@ interface OfferingProgram {
 const OFFERING_PROGRAMS: OfferingProgram[] = [
   {
     id: "guru-paduka-stotram",
-    image: `${import.meta.env.BASE_URL}offerings/card-4-guru-paduka.jpg`,
+    image: `${import.meta.env.BASE_URL}guru-paduka-stotram.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
     title: "GURU PADUKA STOTRAM",
     subtitle: "Lifetime Access",
     price: "INR 1500",
-    buttonText: "BEGIN NOW",
+    buttonText: "EXPLORE PROGRAM",
     paymentUrl: "https://rzp.io/rzp/guru-paduka-stotram",
-  },
-  {
-    id: "parvati-panchakam",
-    image: `${import.meta.env.BASE_URL}transformative-body-mind.jpg`,
-    sessionType: "RECORDED SESSION | 1 HR 30 MINS",
-    tags: ["WORKSHOPS", "CHANTS"],
-    title: "PARVATI PANCHAKAM",
-    subtitle: "Lifetime Access",
-    price: "INR 1500",
-    buttonText: "BEGIN NOW",
-  },
-  {
-    id: "bhairavi-stavan",
-    image: `${import.meta.env.BASE_URL}lamp.jpeg`,
-    sessionType: "RECORDED SESSION | 1 HR 30 MINS",
-    tags: ["WORKSHOPS", "CHANTS"],
-    title: "BHAIRAVI STAVAN",
-    subtitle: "Lifetime Access",
-    price: "INR 1500",
-    buttonText: "BEGIN NOW",
   },
   {
     id: "linga-bhairavi-shayan-arati",
@@ -143,42 +180,62 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
     title: "LINGA BHAIRAVI SHAYAN ARATI",
     subtitle: "Lifetime Access",
     price: "INR 1500",
-    buttonText: "BEGIN NOW",
+    buttonText: "EXPLORE PROGRAM",
   },
   {
     id: "soundarya-lahari",
-    image: `${import.meta.env.BASE_URL}offerings/card-1-guru-ashtakam.jpg`,
+    image: `${import.meta.env.BASE_URL}soundarya-lahari.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
     title: "SOUNDARYA LAHARI",
     subtitle: "Lifetime Access",
     price: "INR 1500",
-    buttonText: "BEGIN NOW",
+    buttonText: "EXPLORE PROGRAM",
   },
   {
     id: "gauranga",
-    image: `${import.meta.env.BASE_URL}joyful-exploration.jpg`,
+    image: `${import.meta.env.BASE_URL}gauranga.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
     title: "GAURANGA",
     subtitle: "Lifetime Access",
     price: "INR 1500",
-    buttonText: "BEGIN NOW",
+    buttonText: "EXPLORE PROGRAM",
+  },
+  {
+    id: "parvati-panchakam",
+    image: `${import.meta.env.BASE_URL}parvati-panchakam.jpg`,
+    sessionType: "RECORDED SESSION | 1 HR 30 MINS",
+    tags: ["WORKSHOPS", "CHANTS"],
+    title: "PARVATI PANCHAKAM",
+    subtitle: "Lifetime Access",
+    price: "INR 1500",
+    buttonText: "EXPLORE PROGRAM",
   },
   {
     id: "nirvana-shatakam",
-    image: `${import.meta.env.BASE_URL}living-tradition.jpg`,
+    image: `${import.meta.env.BASE_URL}nirvana-shatakam.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
     title: "NIRVANA SHATAKAM",
     subtitle: "Lifetime Access",
     price: "INR 1500",
-    buttonText: "BEGIN NOW",
+    buttonText: "EXPLORE PROGRAM",
+  },
+  {
+    id: "bhairavi-stavan",
+    image: `${import.meta.env.BASE_URL}bhairavi-stavan.jpg`,
+    sessionType: "RECORDED SESSION | 1 HR 30 MINS",
+    tags: ["WORKSHOPS", "CHANTS"],
+    title: "BHAIRAVI STAVAN",
+    subtitle: "Lifetime Access",
+    price: "INR 1500",
+    buttonText: "EXPLORE PROGRAM",
   }
 ];
 
 /* --- BEGIN YOUR JOURNEY: OFFERINGS CAROUSEL --- */
-const ChantMarqueeSection = () => {
+const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => void }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -268,7 +325,7 @@ const ChantMarqueeSection = () => {
                 </div>
 
                 {/* Card Content with Generous Breathing Space */}
-                <div className="p-6 sm:p-7 md:p-8 pb-3">
+                <div className="p-6 sm:p-7 md:p-8 pb-7">
                   {/* Session Type / Duration Header Line */}
                   <p className="text-zinc-100 font-serif tracking-[0.14em] uppercase text-xs sm:text-sm font-medium mb-4">
                     {program.sessionType}
@@ -303,17 +360,24 @@ const ChantMarqueeSection = () => {
                 </div>
               </div>
 
-              {/* Bottom Rounded Pill Button with Generous Margin */}
-              <div className="p-6 sm:p-7 md:p-8 pt-3 pb-7 md:pb-8">
-                <a 
-                  href={program.paymentUrl || `https://wa.me/919790778251?text=${encodeURIComponent(`Hi, I would like to begin sadhana for ${program.title}`)}`}
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-full py-3.5 px-6 rounded-full border border-[#8C7A5B] hover:border-[#D4AF37] bg-transparent hover:bg-white/5 text-center font-serif text-xs sm:text-sm tracking-[0.2em] uppercase text-white font-medium transition-all duration-300 cursor-pointer block active:scale-[0.98]"
-                >
-                  {program.buttonText}
-                </a>
-              </div>
+              {/* Bottom Flush Edge-to-Edge Saffron-Yellow Action Bar */}
+              <a 
+                href={program.paymentUrl || `https://wa.me/919790778251?text=${encodeURIComponent(`Hi, I would like to begin sadhana for ${program.title}`)}`}
+                target="_blank" 
+                rel="noopener noreferrer" 
+                onClick={(e) => {
+                  if (
+                    program.id === 'guru-paduka-stotram' ||
+                    program.title.trim().toLowerCase() === 'guru paduka stotram'
+                  ) {
+                    e.preventDefault();
+                    onOpenGuruPaduka();
+                  }
+                }}
+                className="w-full py-4 px-6 rounded-none bg-[#F4B41A] group-hover:bg-[#EE8426] text-center font-sans text-xs sm:text-[0.85rem] tracking-[0.14em] uppercase text-[#111215] font-bold transition-colors duration-300 ease-in-out cursor-pointer block active:brightness-95"
+              >
+                {program.buttonText}
+              </a>
             </div>
           ))}
         </div>
@@ -330,59 +394,6 @@ const ChantMarqueeSection = () => {
         )}
       </div>
     </div>
-  );
-};
-
-const HeroButton = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let time = 0;
-    let animationFrameId: number;
-
-    const drawCanvas = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-      const stop1 = (Math.sin(time * 0.05) + 1) * 0.5;
-      
-      // Copper and Gold colors matching the theme
-      gradient.addColorStop(0, `rgba(193, 127, 89, ${0.1 + stop1 * 0.15})`);
-      gradient.addColorStop(0.5, `rgba(201, 169, 110, ${0.1 + (1-stop1) * 0.15})`);
-      gradient.addColorStop(1, `rgba(193, 127, 89, ${0.1 + stop1 * 0.15})`);
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = 'rgba(245, 240, 235, 0.2)';
-      for(let i = 0; i < 5; i++) {
-        const px = (Math.sin(time * 0.02 + i) * 0.5 + 0.5) * canvas.width;
-        const py = (Math.cos(time * 0.03 + i) * 0.5 + 0.5) * canvas.height;
-        ctx.beginPath();
-        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      
-      time++;
-      animationFrameId = requestAnimationFrame(drawCanvas);
-    };
-
-    drawCanvas();
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  return (
-    <button onClick={() => document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' })} className="btn-hero-webgl pointer-events-auto">
-      <canvas ref={canvasRef} width="220" height="51" className="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
-      <span className="btn-hero-webgl-text">
-        EXPLORE PROGRAMS
-        <ArrowRight size={16} />
-      </span>
-    </button>
   );
 };
 
@@ -503,12 +514,173 @@ const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen, onClo
   );
 };
 
+/* --- GURU PADUKA STOTRAM PROGRAM DETAILS MODAL --- */
+interface GuruPadukaDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  paymentUrl: string;
+}
+
+const GuruPadukaDetailsModal: React.FC<GuruPadukaDetailsModalProps> = ({ isOpen, onClose, paymentUrl }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          {/* Dark Charcoal Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/85 backdrop-blur-sm cursor-pointer"
+            aria-hidden="true"
+          />
+
+          {/* Parchment Sheet Modal Container */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 w-full max-w-[780px] max-h-[90vh] bg-[#F5F1E8] text-zinc-900 rounded-sm shadow-[0_30px_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guru-paduka-modal-title"
+          >
+            {/* Top White Sticky Header */}
+            <div className="bg-white border-b border-zinc-200 px-6 sm:px-10 py-5 sm:py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shrink-0 shadow-[0_4px_18px_rgba(0,0,0,0.05)]">
+              <div className="pr-8 sm:pr-0">
+                <h2
+                  id="guru-paduka-modal-title"
+                  className="font-sans font-bold uppercase tracking-wide text-lg sm:text-xl text-zinc-900"
+                >
+                  GURU PADUKA STOTRAM
+                </h2>
+                <p className="font-['Lato'] text-xs sm:text-sm text-zinc-600 mt-1">
+                  chant, classical | English | Ages 7+ | Recorded online 1-hour session
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <a
+                  href={paymentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center bg-[#F2B718] hover:bg-[#E2A80E] text-[#1A1610] font-sans font-bold text-xs sm:text-[0.8rem] tracking-[0.08em] uppercase px-7 py-3.5 rounded-[3px] shadow-sm transition-colors whitespace-nowrap"
+                >
+                  GET ACCESS
+                </a>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close program details"
+                  className="p-2 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors cursor-pointer"
+                >
+                  <X size={20} strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Parchment Content */}
+            <div className="overflow-y-auto px-6 sm:px-12 md:px-14 py-8 sm:py-10 text-left font-['Lato'] text-zinc-800">
+              {/* About Section */}
+              <section className="mb-8">
+                <h3 className="font-['Playfair_Display'] font-normal text-2xl sm:text-[1.8rem] text-zinc-900 mb-4">
+                  About
+                </h3>
+                <h4 className="font-sans font-bold text-sm sm:text-[0.95rem] text-zinc-900 mb-2.5">
+                  Basking In Grace
+                </h4>
+                <p className="text-sm sm:text-[0.95rem] leading-[1.7] text-zinc-800">
+                  Composed by Adi Shankaracharya over a thousand years ago, Guru Paduka Stotram is a well-known Sanskrit chant expressing the importance of the Guru&apos;s grace. Walking on the banks of the river Narmada in search of his spiritual master, Adi Shankaracharya beheld the sandals of his Guru for the first time, and in an outpouring of devotion, recited the Guru Paduka Stotram. Reap the immense benefits of chanting these powerful verses through this guided self-paced session.
+                </p>
+
+                <h4 className="font-sans font-bold text-sm sm:text-[0.95rem] text-zinc-900 mt-6 mb-2.5">
+                  Highlights
+                </h4>
+                <ul className="list-disc pl-6 space-y-1.5 text-sm sm:text-[0.95rem] leading-[1.65] text-zinc-800">
+                  <li>Learn the chant with the right pronunciation</li>
+                  <li>Receive post-session support, which includes access to our WhatsApp community</li>
+                </ul>
+              </section>
+
+              {/* Program Details Section */}
+              <section>
+                <h3 className="font-['Playfair_Display'] font-normal text-2xl sm:text-[1.8rem] text-zinc-900 mb-4">
+                  Program Details
+                </h3>
+                <div className="space-y-3 text-sm sm:text-[0.95rem] text-zinc-800">
+                  <p>
+                    <strong className="font-bold text-zinc-900">Session Details:</strong> Pre-recorded 1-hour video session (self-paced access via private streaming link)
+                  </p>
+                  <p>
+                    <strong className="font-bold text-zinc-900">Medium of Instruction:</strong> English
+                  </p>
+                  <p>
+                    <strong className="font-bold text-zinc-900">Eligibility:</strong> Ages 7+
+                  </p>
+                </div>
+
+                <h4 className="font-sans font-bold text-sm sm:text-[0.95rem] text-zinc-900 mt-6 mb-2.5">
+                  Guidelines &amp; Requirements
+                </h4>
+                <ul className="list-disc pl-6 space-y-1.5 text-sm sm:text-[0.95rem] leading-[1.65] text-zinc-800">
+                  <li>It is essential to watch and practice the complete 1-hour video from start to finish in a single sitting without skipping ahead to learn the chant effectively.</li>
+                  <li>It is best to be in a private and quiet space where you can chant aloud.</li>
+                  <li>Although not mandatory, it is supportive to maintain a light-stomach condition while practicing with the video.</li>
+                  <li>Google Chrome version 85 or later (or any updated modern browser) is recommended for smooth playback.</li>
+                  <li>A stable Wi-Fi or wired internet connection is recommended for uninterrupted video streaming.</li>
+                </ul>
+              </section>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 function App() {
   const [activeTheme, setActiveTheme] = useState('light');
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showGuruPadukaModal, setShowGuruPadukaModal] = useState(false);
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Preload all hero images for seamless 10-second transitions
+    HERO_SLIDES.forEach((slide) => {
+      const img = new window.Image();
+      img.src = slide.image;
+    });
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 10000);
+    return () => window.clearInterval(timer);
+  }, [activeHeroSlide]);
+
+  const currentHeroSlide = HERO_SLIDES[activeHeroSlide];
 
   useEffect(() => {
     // Check URL query parameters for course=guru-paduka-stotram (or Razorpay payment return)
@@ -574,112 +746,174 @@ function App() {
 
   // Smooth Parallax
   const { scrollYProgress } = useScroll();
-  const yParallaxHero = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const yParallaxFast = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
-  const opacityFade = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   return (
     <div className="relative w-full overflow-x-hidden selection:bg-[#B84A32] selection:text-[#FDFBF7] font-['Lato'] font-normal bg-[#FDFBF7] text-zinc-900 flex flex-col">
       
-      {/* Navigation (Aperture Style) */}
+      {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 pointer-events-none transition-all duration-300 flex flex-col ${
         isScrolled 
           ? "bg-white/95 backdrop-blur-md shadow-sm text-zinc-900 border-b border-zinc-200" 
-          : "bg-transparent text-white border-b border-transparent"
+          : "bg-[#121213]/95 backdrop-blur-sm text-white border-b border-white/[0.08]"
       }`}>
-        {/* Dark ambient overlay specifically for top state to avoid harsh lines */}
-        <div 
-          className={`absolute top-0 left-0 w-full h-[35vh] bg-gradient-to-b from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-500 z-[-1] ${
-            isScrolled ? "opacity-0" : "opacity-100"
-          }`}
-        ></div>
-
-        <div className={`w-full px-6 md:px-12 flex justify-between items-center transition-all duration-300 ${
-          isScrolled ? "h-16 py-4" : "h-16 md:h-20 mt-4 md:mt-6"
-        }`}>
-          <a href="#" className={`nav-logo pointer-events-auto font-serif uppercase font-normal tracking-[0.25em] no-underline transition-colors ${
-          isScrolled ? "text-zinc-900" : "text-white hover:text-zinc-300"
-        }`} style={{ fontFamily: "'Cinzel', serif" }}>
+        <div className="w-full px-6 md:px-12 lg:px-[6vw] h-16 md:h-[74px] flex justify-between items-center transition-all duration-300">
+          <a
+            href="#"
+            className={`pointer-events-auto font-serif uppercase font-normal text-base md:text-lg tracking-[0.22em] no-underline transition-colors whitespace-nowrap shrink-0 ${
+              isScrolled ? "text-zinc-900" : "text-[#DFC186] hover:text-[#EED39B]"
+            }`}
+            style={{ fontFamily: "'Cinzel', serif" }}
+          >
             Nada Sannidhi
-        </a>
-        <div className="hidden md:flex gap-10 items-center pointer-events-auto">
-            <a href="#programs-section" className={`nav-link font-['Lato'] font-medium text-xs tracking-widest transition-all duration-300 ${isScrolled ? "text-zinc-900 hover:text-zinc-500" : "text-white opacity-80 hover:opacity-100 hover:text-zinc-300"}`}>Programs</a>
-            <a href="#guide" className={`nav-link font-['Lato'] font-medium text-xs tracking-widest transition-all duration-300 ${isScrolled ? "text-zinc-900 hover:text-zinc-500" : "text-white opacity-80 hover:opacity-100 hover:text-zinc-300"}`}>Guide</a>
-            <a href="#reflections" className={`nav-link font-['Lato'] font-medium text-xs tracking-widest transition-all duration-300 ${isScrolled ? "text-zinc-900 hover:text-zinc-500" : "text-white opacity-80 hover:opacity-100 hover:text-zinc-300"}`}>Sharings</a>
-            <a href="https://wa.me/919790778251" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 rounded-full px-6 py-2 transition-colors duration-300 text-xs font-['Lato'] font-medium tracking-widest uppercase pointer-events-auto ${
-              isScrolled 
-                ? "bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-900" 
-                : "border border-white hover:bg-white text-white hover:text-black"
-            }`}>
-              <span>Begin Here</span>
-              <ArrowRight size={16} />
+          </a>
+          <div className="hidden md:flex gap-9 items-center pointer-events-auto">
+            <a
+              href="#programs-section"
+              className={`font-['Lato'] font-medium text-xs tracking-[0.18em] uppercase transition-colors duration-200 whitespace-nowrap shrink-0 ${
+                isScrolled ? "text-zinc-800 hover:text-zinc-500" : "text-[#D8D3CA] hover:text-[#EED39B]"
+              }`}
+            >
+              Programs
             </a>
-        </div>
+            <a
+              href="#guide"
+              className={`font-['Lato'] font-medium text-xs tracking-[0.18em] uppercase transition-colors duration-200 whitespace-nowrap shrink-0 ${
+                isScrolled ? "text-zinc-800 hover:text-zinc-500" : "text-[#D8D3CA] hover:text-[#EED39B]"
+              }`}
+            >
+              Guide
+            </a>
+            <a
+              href="#reflections"
+              className={`font-['Lato'] font-medium text-xs tracking-[0.18em] uppercase transition-colors duration-200 whitespace-nowrap shrink-0 ${
+                isScrolled ? "text-zinc-800 hover:text-zinc-500" : "text-[#D8D3CA] hover:text-[#EED39B]"
+              }`}
+            >
+              Sharings
+            </a>
+            <a
+              href="https://wa.me/919790778251"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-2 transition-all duration-200 text-xs font-['Lato'] font-medium tracking-[0.16em] uppercase pointer-events-auto whitespace-nowrap shrink-0 ${
+                isScrolled 
+                  ? "bg-zinc-900 text-white hover:bg-zinc-800 border border-zinc-900" 
+                  : "border border-[#C9A35B]/80 text-[#E5C687] hover:bg-[#E5C687] hover:text-[#121213]"
+              }`}
+            >
+              <span>Begin Here</span>
+              <ArrowRight size={14} />
+            </a>
+          </div>
         </div>
       </nav>
 
-      {/* --- ROOM 1: HERO / INITIATION --- */}
-      <ThemeSection id="arrival" bgClass="bg-[#0B0A09]" theme="dark" setActiveTheme={setActiveTheme}>
-        <div className="min-h-[100svh] w-full relative overflow-hidden flex items-center justify-center">
-          {/* Main Hero Background Pillar Image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-transform duration-1000"
-            style={{ backgroundImage: `url(${pillarImg})` }}
-          />
-
-          {/* Atmospheric gradient overlay: keeping the center and pillar clear and rich */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/60 z-0 pointer-events-none"></div>
-          {/* Subtle radial shadow to frame the cutout text against the background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/55 via-black/20 to-transparent z-0 pointer-events-none"></div>
-          <div className="mandala-mask z-0 opacity-15"></div>
-
-          <motion.div style={{ y: yParallaxHero, opacity: opacityFade }} className="relative z-10 flex flex-col items-center justify-center text-center px-4 text-white max-w-5xl mx-auto pt-6 md:pt-8">
-            <motion.h1 
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="leading-none md:leading-tight font-serif uppercase text-center select-none mb-5 md:mb-7"
-            >
-              {/* Option 2: Warm Antique Gold / Copper Foil Gradient */}
-              <span className="block text-5xl md:text-7xl lg:text-[6.5rem] font-normal tracking-[0.14em] bg-gradient-to-r from-[#FBF2E3] via-[#E4C87F] to-[#D4A359] bg-clip-text text-transparent drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] drop-shadow-[0_0_35px_rgba(228,200,127,0.35)]">
-                NADA
-              </span>
-              <span className="block text-6xl md:text-8xl lg:text-[8rem] font-bold tracking-tight bg-gradient-to-r from-[#FCE8B8] via-[#E5B563] to-[#C97B32] bg-clip-text text-transparent drop-shadow-[0_6px_30px_rgba(0,0,0,0.95)] drop-shadow-[0_0_50px_rgba(201,123,50,0.45)]">
-                SANNIDHI
-              </span>
-            </motion.h1>
-
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="font-sans text-base md:text-xl lg:text-2xl font-extralight tracking-[0.08em] md:tracking-[0.12em] uppercase text-center text-[#F2EBE1]/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] mb-8 md:mb-11"
-            >
-              Offering Sacred Chants and Classical Music
-            </motion.p>
+      {/* --- ROOM 1: SPLIT-SCREEN HERO --- */}
+      <ThemeSection id="arrival" bgClass="bg-[#121213]" theme="dark" setActiveTheme={setActiveTheme}>
+        <div className="w-full bg-[#121213] pt-16 md:pt-[74px]">
+          <div className="relative w-full min-h-[calc(100svh-4rem)] md:min-h-[calc(100svh-74px)] bg-[#121213] flex flex-col lg:flex-row lg:items-stretch overflow-hidden">
             
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.5, delay: 0.9, ease: "easeOut" }}
-            >
-              <HeroButton />
-            </motion.div>
-          </motion.div>
+            {/* Right Portion: Full Hero Visual cycling every 10 seconds — Soft Focus / Blurred Dissolve */}
+            <div className="relative w-full h-[46vh] min-h-[300px] sm:h-[52vh] lg:h-auto lg:min-h-full lg:absolute lg:inset-y-0 lg:right-0 lg:w-[72%] bg-[#181716] overflow-hidden order-1 lg:order-2">
+              <AnimatePresence initial={false} mode="sync">
+                <motion.img
+                  key={currentHeroSlide.id}
+                  src={currentHeroSlide.image}
+                  alt={currentHeroSlide.alt}
+                  referrerPolicy="no-referrer"
+                  initial={{
+                    opacity: 0,
+                    filter: prefersReducedMotion ? "blur(0px)" : "blur(10px)",
+                    scale: prefersReducedMotion ? 1 : 1.02,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    filter: prefersReducedMotion ? "blur(0px)" : "blur(8px)",
+                    scale: prefersReducedMotion ? 1 : 1.01,
+                  }}
+                  transition={{
+                    duration: 1.4,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  style={{ objectPosition: currentHeroSlide.objectPosition }}
+                  className="absolute inset-0 w-full h-full object-cover lg:object-right select-none will-change-[opacity,filter,transform]"
+                />
+              </AnimatePresence>
+              {/* Seamless horizontal blend from dark charcoal left overlay into hero visual on desktop */}
+              <div
+                className="hidden lg:block absolute inset-y-0 left-0 w-[44%] bg-gradient-to-r from-[#121213] via-[#121213]/85 to-transparent pointer-events-none z-10"
+                aria-hidden="true"
+              />
+              {/* Subtle bottom blend for mobile stacked view */}
+              <div
+                className="lg:hidden absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#121213] via-[#121213]/60 to-transparent pointer-events-none z-10"
+                aria-hidden="true"
+              />
+            </div>
 
-          {/* Scroll Indicator */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 3, delay: 1.5 }}
-            className="absolute bottom-12 right-6 md:right-12 flex flex-col items-center gap-4 z-20"
-          >
-              <span className="font-['Lato'] font-medium text-xs tracking-widest uppercase text-white [writing-mode:vertical-lr] rotate-180">Scroll</span>
-              <div className="w-[1px] h-16 bg-white/20 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full bg-[#B84A32] scroll-line-anim"></div>
+            {/* Left Portion: Dark Charcoal Overlay — Soft Focus / Blurred Dissolve */}
+            <div className="relative z-10 w-full lg:w-[46%] xl:w-[44%] bg-[#121213] lg:bg-transparent px-6 sm:px-10 lg:pl-[6vw] lg:pr-10 py-12 sm:py-16 lg:py-20 flex flex-col justify-center items-start text-left order-2 lg:order-1">
+              <div className="max-w-xl w-full">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={currentHeroSlide.id}
+                    initial={{ opacity: 0, filter: prefersReducedMotion ? "blur(0px)" : "blur(6px)" }}
+                    animate={{ opacity: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, filter: prefersReducedMotion ? "blur(0px)" : "blur(6px)", transition: { duration: 0.45, ease: "easeIn" } }}
+                    transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <h1 className="font-['Playfair_Display'] font-normal text-4xl sm:text-5xl lg:text-[3.4rem] xl:text-[3.85rem] leading-[1.12] tracking-[-0.01em] mb-5 md:mb-6">
+                      <span className="block text-[#FDFBF7]">{currentHeroSlide.headlineTop}</span>
+                      <span className="block bg-gradient-to-r from-[#FCE8B8] via-[#E5B563] to-[#C97B32] bg-clip-text text-transparent">
+                        {currentHeroSlide.headlineAccent}
+                      </span>
+                    </h1>
+
+                    <p className="font-['Lato'] font-normal text-base sm:text-lg lg:text-[1.2rem] leading-[1.55] tracking-[0.01em] text-[#D8D6D0] mb-8 md:mb-10 max-w-md">
+                      {currentHeroSlide.subheadline}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center justify-center rounded-full bg-[#F4B41A] hover:bg-[#EE8426] text-[#111215] font-sans font-bold text-xs sm:text-[0.8rem] tracking-[0.11em] uppercase px-8 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4B41A]"
+                >
+                  EXPLORE PROGRAMS →
+                </button>
+
+                {/* Subtle Slide Indicator Dashes */}
+                <div className="mt-10 flex items-center gap-2.5" role="tablist" aria-label="Hero slides">
+                  {HERO_SLIDES.map((slide, index) => {
+                    const isActive = index === activeHeroSlide;
+                    return (
+                      <button
+                        key={slide.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-label={`Show slide ${index + 1}: ${slide.headlineTop} ${slide.headlineAccent}`}
+                        onClick={() => setActiveHeroSlide(index)}
+                        className={`h-[3px] rounded-full transition-all duration-500 cursor-pointer ${
+                          isActive
+                            ? "w-8 bg-[#E5B563]"
+                            : "w-4 bg-white/20 hover:bg-white/45"
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-          </motion.div>
+            </div>
 
+          </div>
         </div>
       </ThemeSection>
 
@@ -840,7 +1074,7 @@ function App() {
         <div className="mandala-mask z-0 opacity-5"></div>
         
         {/* Option 1: Gentle Continuous Auto-Scroll (Infinite Ambient Marquee) */}
-        <ChantMarqueeSection />
+        <ChantMarqueeSection onOpenGuruPaduka={() => setShowGuruPadukaModal(true)} />
 
         <div className="pt-8 md:pt-16 pb-24 w-full px-[8vw] md:px-[10vw] relative z-10">
           {/* Carnatic Vocals Pillar */}
@@ -1000,6 +1234,13 @@ function App() {
 
       {/* RAZORPAY PAYMENT SUCCESS MODAL */}
       <PaymentSuccessModal isOpen={showSuccessModal} onClose={handleCloseModal} />
+
+      {/* GURU PADUKA STOTRAM PROGRAM DETAILS MODAL */}
+      <GuruPadukaDetailsModal
+        isOpen={showGuruPadukaModal}
+        onClose={() => setShowGuruPadukaModal(false)}
+        paymentUrl="https://rzp.io/rzp/guru-paduka-stotram"
+      />
 
     </div>
   );
