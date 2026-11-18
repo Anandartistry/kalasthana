@@ -5,6 +5,7 @@ import {
   X, Play, CheckCircle2, ExternalLink
 } from 'lucide-react';
 import anandImg from '/anand.jpeg';
+import { CarnaticVocalsModal } from './components/CarnaticVocalsModal';
 
 /* --- UTILS --- */
 const FadeIn = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
@@ -309,77 +310,88 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
           ref={trackRef}
           className="w-full overflow-x-auto scroll-smooth scrollbar-none py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] snap-x snap-mandatory flex gap-7 md:gap-8"
         >
-          {OFFERING_PROGRAMS.map((program) => (
-            <div 
-              key={program.id} 
-              className="w-[310px] sm:w-[350px] md:w-[370px] shrink-0 snap-start bg-[#101724] border border-zinc-800/80 rounded-lg overflow-hidden flex flex-col justify-between shadow-[0_16px_40px_rgba(0,0,0,0.4)] hover:border-zinc-700 hover:shadow-[0_24px_55px_rgba(0,0,0,0.55)] transition-all duration-300 group cursor-default"
-            >
-              <div>
-                {/* Top Image: Stately 4:3 Aspect Ratio */}
-                <div className="relative w-full aspect-[4/3] overflow-hidden bg-zinc-900 shrink-0">
-                  <img 
-                    src={program.image} 
-                    alt={program.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                  />
-                </div>
+          {OFFERING_PROGRAMS.map((program) => {
+            const isGuruPaduka =
+              program.id === 'guru-paduka-stotram' ||
+              program.title.trim().toLowerCase() === 'guru paduka stotram';
 
-                {/* Card Content with Generous Breathing Space */}
-                <div className="p-6 sm:p-7 md:p-8 pb-7">
-                  {/* Session Type / Duration Header Line */}
-                  <p className="text-zinc-100 font-serif tracking-[0.14em] uppercase text-xs sm:text-sm font-medium mb-4">
-                    {program.sessionType}
-                  </p>
-
-                  {/* Tags Pill Row */}
-                  <div className="flex items-center gap-2.5 mb-5">
-                    {program.tags.map((tag, tIdx) => (
-                      <span 
-                        key={tIdx} 
-                        className="px-3.5 py-1 rounded-full border border-zinc-600/80 bg-zinc-800/40 text-[0.68rem] sm:text-xs font-['Lato'] font-medium uppercase tracking-wider text-zinc-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Program Title */}
-                  <h3 className="text-white font-serif uppercase tracking-wider font-semibold text-xl sm:text-2xl leading-snug mb-3">
-                    {program.title}
-                  </h3>
-
-                  {/* Subtitle / Access */}
-                  <p className="text-zinc-300 text-sm sm:text-base font-['Lato'] font-normal mb-5">
-                    {program.subtitle}
-                  </p>
-
-                  {/* Price */}
-                  <p className="text-white font-bold text-xl sm:text-2xl font-['Lato'] tracking-wide">
-                    {program.price}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Flush Edge-to-Edge Saffron-Yellow Action Bar */}
-              <a 
-                href={program.paymentUrl || `https://wa.me/919790778251?text=${encodeURIComponent(`Hi, I would like to begin sadhana for ${program.title}`)}`}
-                target="_blank" 
-                rel="noopener noreferrer" 
+            return (
+              <div
+                key={program.id}
                 onClick={(e) => {
-                  if (
-                    program.id === 'guru-paduka-stotram' ||
-                    program.title.trim().toLowerCase() === 'guru paduka stotram'
-                  ) {
-                    e.preventDefault();
+                  if (isGuruPaduka) {
                     onOpenGuruPaduka();
+                    return;
+                  }
+                  if (!(e.target as HTMLElement).closest('a')) {
+                    e.currentTarget.querySelector('a')?.click();
                   }
                 }}
-                className="w-full py-4 px-6 rounded-none bg-[#F4B41A] group-hover:bg-[#EE8426] text-center font-sans text-xs sm:text-[0.85rem] tracking-[0.14em] uppercase text-[#111215] font-bold transition-colors duration-300 ease-in-out cursor-pointer block active:brightness-95"
+                className="w-[310px] sm:w-[350px] md:w-[370px] shrink-0 snap-start bg-[#101724] border border-zinc-800/80 rounded-lg overflow-hidden flex flex-col justify-between shadow-[0_16px_40px_rgba(0,0,0,0.4)] hover:border-zinc-700 hover:shadow-[0_24px_55px_rgba(0,0,0,0.55)] transition-all duration-300 group cursor-pointer"
               >
-                {program.buttonText}
-              </a>
-            </div>
-          ))}
+                <div>
+                  {/* Top Image: Stately 4:3 Aspect Ratio */}
+                  <div className="relative w-full aspect-[4/3] overflow-hidden bg-zinc-900 shrink-0">
+                    <img
+                      src={program.image}
+                      alt={program.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+
+                  {/* Card Content with Generous Breathing Space */}
+                  <div className="p-6 sm:p-7 md:p-8 pb-7">
+                    {/* Session Type / Duration Header Line */}
+                    <p className="text-zinc-100 font-serif tracking-[0.14em] uppercase text-xs sm:text-sm font-medium mb-4">
+                      {program.sessionType}
+                    </p>
+
+                    {/* Tags Pill Row */}
+                    <div className="flex items-center gap-2.5 mb-5">
+                      {program.tags.map((tag, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="px-3.5 py-1 rounded-full border border-zinc-600/80 bg-zinc-800/40 text-[0.68rem] sm:text-xs font-['Lato'] font-medium uppercase tracking-wider text-zinc-300"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Program Title */}
+                    <h3 className="text-white font-serif uppercase tracking-wider font-semibold text-xl sm:text-2xl leading-snug mb-3">
+                      {program.title}
+                    </h3>
+
+                    {/* Subtitle / Access */}
+                    <p className="text-zinc-300 text-sm sm:text-base font-['Lato'] font-normal mb-5">
+                      {program.subtitle}
+                    </p>
+
+                    {/* Price */}
+                    <p className="text-white font-bold text-xl sm:text-2xl font-['Lato'] tracking-wide">
+                      {program.price}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bottom Flush Edge-to-Edge Saffron-Yellow Action Bar */}
+                <a
+                  href={program.paymentUrl || `https://wa.me/919790778251?text=${encodeURIComponent(`Hi, I would like to begin sadhana for ${program.title}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (isGuruPaduka) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full py-4 px-6 rounded-none bg-[#F4B41A] group-hover:bg-[#EE8426] text-center font-['Montserrat',sans-serif] text-[13.5px] tracking-[0.12em] uppercase text-[#111215] font-bold transition-colors duration-300 ease-in-out cursor-pointer block active:brightness-95"
+                >
+                  {program.buttonText}
+                </a>
+              </div>
+            );
+          })}
         </div>
 
         {/* Right Arrow Button */}
@@ -458,7 +470,7 @@ const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen, onClo
 
             {/* Top Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#B84A32]/40 bg-[#B84A32]/10 text-[#E87A60] text-[0.68rem] sm:text-xs font-['Lato'] tracking-[0.22em] uppercase font-medium mb-5">
-              <span>WELCOME TO NADA SANNIDHI FAMILY</span>
+              <span>WELCOME TO KALASTHANA FAMILY</span>
             </div>
 
             {/* Sacred Icon Badge */}
@@ -496,7 +508,7 @@ const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen, onClo
                 rel="noopener noreferrer"
                 className="w-full py-3.5 px-6 rounded-full border border-[#8C7A5B]/70 hover:border-[#E87A60] bg-[#141C28]/80 hover:bg-[#B84A32]/15 text-[#FDFBF7] hover:text-[#E87A60] text-xs sm:text-sm font-['Lato'] tracking-[0.12em] uppercase font-medium transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group active:scale-[0.98]"
               >
-                <span>💬 JOIN NADA SANNIDHI WHATSAPP COMMUNITY</span>
+                <span>💬 JOIN KALASTHANA WHATSAPP COMMUNITY</span>
               </a>
 
               {/* Dismiss / Return to storefront button */}
@@ -581,7 +593,7 @@ const GuruPadukaDetailsModal: React.FC<GuruPadukaDetailsModalProps> = ({ isOpen,
                   href={paymentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center bg-[#F2B718] hover:bg-[#E2A80E] text-[#1A1610] font-sans font-bold text-xs sm:text-[0.8rem] tracking-[0.08em] uppercase px-7 py-3.5 rounded-[3px] shadow-sm transition-colors whitespace-nowrap"
+                  className="inline-flex items-center justify-center bg-[#F2B718] hover:bg-[#E2A80E] text-[#1A1610] font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase px-7 py-3.5 rounded-[3px] shadow-sm transition-colors whitespace-nowrap"
                 >
                   GET ACCESS
                 </a>
@@ -661,6 +673,7 @@ function App() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showGuruPadukaModal, setShowGuruPadukaModal] = useState(false);
+  const [isCarnaticModalOpen, setIsCarnaticModalOpen] = useState(false);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const prefersReducedMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -765,7 +778,7 @@ function App() {
             }`}
             style={{ fontFamily: "'Cinzel', serif" }}
           >
-            Nada Sannidhi
+            KALASTHANA
           </a>
           <div className="hidden md:flex gap-9 items-center pointer-events-auto">
             <a
@@ -884,7 +897,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center justify-center rounded-full bg-[#F4B41A] hover:bg-[#EE8426] text-[#111215] font-sans font-bold text-xs sm:text-[0.8rem] tracking-[0.11em] uppercase px-8 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4B41A]"
+                  className="inline-flex items-center justify-center rounded-full bg-[#F4B41A] hover:bg-[#EE8426] text-[#111215] font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase px-8 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4B41A]"
                 >
                   EXPLORE PROGRAMS →
                 </button>
@@ -1009,7 +1022,7 @@ function App() {
                       </span>
                     </h2>
                     <p className="font-['Lato'] font-light text-base md:text-xl mt-6 text-zinc-300 leading-relaxed max-w-2xl">
-                      Nada Sannidhi brings traditional chanting and classical music out of performance halls and into your daily life. Designed for every seeker, these art forms are offered not merely to be learned, but to be lived—turning sound into a passage toward inner stillness.
+                      Kalasthana brings traditional chanting and classical music out of performance halls and into your daily life. Designed for every seeker, these art forms are offered not merely to be learned, but to be lived—turning sound into a passage toward inner stillness.
                     </p>
                 </FadeIn>
               </div>
@@ -1076,83 +1089,144 @@ function App() {
         {/* Option 1: Gentle Continuous Auto-Scroll (Infinite Ambient Marquee) */}
         <ChantMarqueeSection onOpenGuruPaduka={() => setShowGuruPadukaModal(true)} />
 
-        <div className="pt-8 md:pt-16 pb-24 w-full px-[8vw] md:px-[10vw] relative z-10">
-          {/* Carnatic Vocals Pillar */}
-          <div className="flex flex-col md:flex-row-reverse items-center gap-16 md:gap-24 mt-12 md:mt-20">
-             <motion.div style={{ y: yParallaxFast }} className="w-full md:w-1/2 relative">
-                <div className="w-full aspect-[4/5] bg-[#FDFBF7] artifact-mask relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-noise opacity-30 mix-blend-multiply z-20 transition-opacity duration-[2s] group-hover:opacity-40"></div>
-                   <img src={`${import.meta.env.BASE_URL}string.jpeg`} alt="Carnatic Music" className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[3s] group-hover:scale-105 opacity-90" />
-                   <div className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-[2s] group-hover:opacity-0">
-                     <Volume2 size={40} strokeWidth={0.5} className="text-zinc-900/50" />
-                   </div>
-                </div>
-             </motion.div>
-             <div className="w-full md:w-1/2 flex flex-col justify-center">
-               <FadeIn>
-                 <SectionLabel text="◇ THE CLASSICAL FOUNDATION ◇" color="text-[#B84A32] opacity-90" />
-                 <ScrollParallax>
-                   <h2 className="font-['Playfair_Display'] font-medium text-4xl md:text-5xl text-zinc-900 leading-tight">
-                      Carnatic Vocals
-                   </h2>
-                 </ScrollParallax>
-                 <p className="mt-10 text-zinc-900 text-base md:text-lg font-normal leading-relaxed mb-4">
-                   Born from a profound understanding of life and creation, Carnatic music serves as a powerful vehicle to reach one's ultimate nature. Transforming both the practitioner and the listener—an impact now echoed by modern science—it aligns the human system and brings absolute stillness to the seeker.
-                 </p>
-                 <p className="text-zinc-900 text-base md:text-lg font-normal leading-relaxed mb-10">
-                   This journey requires no prior experience. Whether you are taking your very first step or looking to deepen an existing practice, our highly interactive live online sessions make learning this ancient discipline accessible, engaging, and profoundly rewarding.
-                 </p>
-                 <a href="https://wa.me/919790778251" target="_blank" rel="noopener noreferrer" className="inline-flex w-max items-center gap-2 rounded-full px-8 py-3 bg-zinc-900 hover:bg-zinc-800 transition-all duration-300 text-xs font-['Lato'] font-medium tracking-widest uppercase text-white">
-                   <span>Inquire for Carnatic</span>
-                   <ArrowRight size={14} className="ml-2" />
-                 </a>
-               </FadeIn>
-             </div>
+        {/* Carnatic Vocals Part with Parchment Texture & Angular Transition */}
+        <div className="relative w-full overflow-hidden">
+          {/* Background Texture Image */}
+          <img
+            src={`${import.meta.env.BASE_URL}texture-white.jpeg`}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0"
+          />
+          {/* Subtle top blend from Offerings section (#F3EFEA) + soft readability veil */}
+          <div
+            className="absolute inset-0 bg-[#FDFBF7]/30 pointer-events-none z-0"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#F3EFEA] to-transparent pointer-events-none z-0"
+            aria-hidden="true"
+          />
+
+          <div className="pt-8 md:pt-16 pb-16 md:pb-20 w-full px-[8vw] md:px-[10vw] relative z-10">
+            {/* Carnatic Vocals Pillar */}
+            <div className="flex flex-col md:flex-row-reverse items-center gap-16 md:gap-24 mt-12 md:mt-20">
+               <motion.div style={{ y: yParallaxFast }} className="w-full md:w-1/2 relative">
+                  <div className="w-full aspect-[4/5] bg-[#FDFBF7] artifact-mask rounded-xl shadow-[0_18px_45px_rgba(0,0,0,0.14)] relative overflow-hidden group">
+                     <div className="absolute inset-0 bg-noise opacity-30 mix-blend-multiply z-20 transition-opacity duration-[2s] group-hover:opacity-40"></div>
+                     <img src={`${import.meta.env.BASE_URL}string.jpeg`} alt="Carnatic Music" className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[3s] group-hover:scale-105 opacity-90" />
+                     <div className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-[2s] group-hover:opacity-0">
+                       <Volume2 size={40} strokeWidth={0.5} className="text-zinc-900/50" />
+                     </div>
+                  </div>
+               </motion.div>
+               <div className="w-full md:w-1/2 flex flex-col justify-center">
+                 <FadeIn>
+                   <SectionLabel text="◇ THE CLASSICAL FOUNDATION ◇" color="text-[#B84A32] opacity-90" />
+                   <ScrollParallax>
+                     <h2 className="font-['Playfair_Display'] font-medium text-4xl md:text-5xl text-zinc-900 leading-tight">
+                        Carnatic Vocals
+                     </h2>
+                   </ScrollParallax>
+                   <p className="mt-10 text-zinc-900 text-base md:text-lg font-normal leading-relaxed mb-4">
+                     Born from a profound understanding of sound and consciousness, Carnatic music is more than an art form—it is a disciplined vehicle for inner stillness. Modern science increasingly echoes what practitioners have experienced for centuries: conscious vocal practice aligns the breath, steadies the mind, and brings balance to the human system.
+                   </p>
+                   <p className="text-zinc-900 text-base md:text-lg font-normal leading-relaxed mb-6">
+                     No prior musical background is required. Whether you are taking your very first step into classical music or returning to deepen an existing practice, our interactive live online sessions offer structured, unhurried guidance rooted in traditional pedagogy.
+                   </p>
+                   <p className="text-[11px] sm:text-xs font-['Lato'] font-medium uppercase tracking-[0.14em] text-[#4A463F] mb-7 flex flex-wrap items-center gap-x-3 gap-y-1">
+                     <span>LIVE ONLINE SESSIONS</span>
+                     <span className="text-[#4A463F]/60" aria-hidden="true">|</span>
+                     <span>ALL LEVELS WELCOME</span>
+                     <span className="text-[#4A463F]/60" aria-hidden="true">|</span>
+                     <span>PERSONALIZED GUIDANCE</span>
+                   </p>
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.preventDefault();
+                       e.stopPropagation();
+                       setIsCarnaticModalOpen(true);
+                     }}
+                     className="inline-flex w-max items-center justify-center rounded-md px-7 py-3.5 bg-[#111215] hover:bg-[#EE8426] text-[#FDFBF7] hover:text-[#111215] transition-colors duration-300 ease-in-out font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase cursor-pointer"
+                   >
+                     JOIN LIVE CLASSES
+                   </button>
+                 </FadeIn>
+               </div>
+            </div>
+          </div>
+
+          {/* Two-Tone Angular Transition Divider into Dark Founder Section */}
+          <div className="w-full overflow-hidden leading-none relative z-10" aria-hidden="true">
+            <svg
+              viewBox="0 0 1440 90"
+              preserveAspectRatio="none"
+              className="block w-full h-16 md:h-24 -mb-px"
+            >
+              <polygon fill="#1D2025" points="0,82 1440,20 1440,90 0,90" />
+              <polygon fill="#0A0B0D" points="0,82 810,47 1440,84 1440,90 0,90" />
+            </svg>
           </div>
         </div>
       </ThemeSection>
 
       {/* --- ROOM 4: THE GUIDE (LINEAGE) --- */}
-      <ThemeSection id="guide" bgClass="bg-[#FDFBF7] text-zinc-900 relative" theme="light" setActiveTheme={setActiveTheme}>
-        <div className="mandala-mask z-0 opacity-5"></div>
+      <ThemeSection id="guide" bgClass="bg-[#0A0B0D] text-[#F5F0E6] relative" theme="dark" setActiveTheme={setActiveTheme}>
         <div className="py-24 md:py-32 w-full px-[8vw] md:px-[10vw] relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
             <FadeIn className="lg:col-span-5 relative">
-              <div className="w-full aspect-[3/4] relative overflow-hidden flex items-center justify-center p-4">
-                <div className="absolute inset-0 border border-[#B84A32] translate-x-4 translate-y-4 md:translate-x-6 md:translate-y-6 z-0 mix-blend-multiply opacity-20"></div>
-            <img src={anandImg} alt="Anand Sreenivasan" className="relative z-10 w-full h-full object-cover transition-transform duration-[3s] hover:scale-105" />
+              <div className="w-full aspect-[3/4] relative overflow-hidden flex items-center justify-center border border-white/10 shadow-2xl">
+                <img src={anandImg} alt="Anand Sreenivasan" className="relative z-10 w-full h-full object-cover transition-transform duration-[3s] hover:scale-105" />
               </div>
             </FadeIn>
             
             <div className="lg:col-span-7 flex flex-col justify-center">
               <FadeIn>
-                <SectionLabel text="The Founder" color="text-[#B84A32] opacity-90" />
+                <SectionLabel text="The Founder" color="text-[#C89B54]" />
                 <ScrollParallax>
-                  <h2 className="font-['Playfair_Display'] font-medium tracking-wide text-4xl md:text-5xl lg:text-6xl text-zinc-900">
-                    Anand <em className="text-gradient not-italic">Sreenivasan</em>
+                  <h2 className="font-['Playfair_Display'] font-medium tracking-wide text-4xl md:text-5xl lg:text-6xl text-[#F5F0E6]">
+                    Anand <em className="not-italic text-[#C89B54]">Sreenivasan</em>
                   </h2>
                 </ScrollParallax>
                 
-                <p className="mt-10 text-lg md:text-xl text-zinc-900 italic mb-10 leading-relaxed font-normal border-l-2 border-[#B84A32] pl-6 py-2">
+                <p className="mt-10 text-lg md:text-xl text-[#EAE4D7] italic mb-10 leading-relaxed font-normal border-l-2 border-[#C89B54] pl-6 py-2">
                   "This is not just an art form; <br/>it is a profound tool to discover one's inner balance."
                 </p>
                 
-                <div className="space-y-6 text-zinc-900 text-base md:text-lg font-normal leading-relaxed max-w-2xl mb-12">
+                <div className="space-y-6 text-[#B8B2A6] text-base md:text-lg font-normal leading-relaxed max-w-2xl mb-12">
                   <p>
-                    Nurtured through over a decade of immersion at Isha Samskriti and serving as a vocalist with Sounds of Isha, Anand offers a pure, traditional transmission. By treating the classical arts not as entertainment, but as a profound science and a path to devotion, this approach naturally opens the doors to inner stillness and boundless joy.
+                    Anand spent over a decade as a classical music teacher at Isha Samskriti (now Sadhguru Gurukulam) and performed as a vocalist and flautist with Sounds of Isha, where he also composed and tuned several chants and songs. Today, he shares this traditional foundation in a patient, structured way—helping students build a steady and joyful practice.
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-10 border-t border-zinc-200 pt-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 border-t border-white/15 pt-10">
                   <div>
-                    <div className="text-4xl font-['Playfair_Display'] font-semibold italic text-zinc-900 mb-2">10+</div>
-                    <div className="font-['Lato'] font-medium text-[0.6rem] tracking-[0.2em] uppercase text-[#B84A32] font-semibold">Years Depth</div>
+                    <div className="text-2xl md:text-[1.7rem] font-['Playfair_Display'] font-medium not-italic text-[#F5F0E6] mb-2 leading-snug">
+                      10+ Years Teaching
+                    </div>
+                    <div className="font-['Montserrat',sans-serif] text-[10px] sm:text-[11px] tracking-[0.16em] uppercase text-[#A89F91] font-semibold leading-relaxed">
+                      FACULTY, ISHA SAMSKRITI (SADHGURU GURUKULAM)
+                    </div>
                   </div>
                   <div>
-                    <div className="text-4xl font-['Playfair_Display'] font-semibold italic text-zinc-900 mb-2">100%</div>
-                    <div className="font-['Lato'] font-medium text-[0.6rem] tracking-[0.2em] uppercase text-[#B84A32] font-semibold">Lineage</div>
+                    <div className="text-2xl md:text-[1.7rem] font-['Playfair_Display'] font-medium not-italic text-[#F5F0E6] mb-2 leading-snug">
+                      Sounds of Isha
+                    </div>
+                    <div className="font-['Montserrat',sans-serif] text-[10px] sm:text-[11px] tracking-[0.16em] uppercase text-[#A89F91] font-semibold leading-relaxed">
+                      VOCALIST &amp; CLASSICAL PRACTITIONER
+                    </div>
                   </div>
                 </div>
+
+                <a
+                  href="https://wa.me/919790778251?text=Namaskaram%20Anand%2C%20I%20visited%20Kalasthana%20and%20would%20love%20to%20connect."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-8 inline-block font-['Montserrat',sans-serif] font-bold text-xs tracking-widest uppercase text-[#C89B54] hover:text-[#F5F0E6] transition-colors duration-200"
+                >
+                  GET IN TOUCH →
+                </a>
               </FadeIn>
             </div>
           </div>
@@ -1209,7 +1283,7 @@ function App() {
            </FadeIn>
         </div>
         <footer className="w-full text-center py-12 text-[0.6rem] uppercase tracking-[0.4em] text-zinc-400 border-t border-zinc-200">
-            NADA SANNIDHI &nbsp; | &nbsp; {new Date().getFullYear()}
+            KALASTHANA &nbsp; | &nbsp; {new Date().getFullYear()}
         </footer>
       </ThemeSection>
 
@@ -1240,6 +1314,12 @@ function App() {
         isOpen={showGuruPadukaModal}
         onClose={() => setShowGuruPadukaModal(false)}
         paymentUrl="https://rzp.io/rzp/guru-paduka-stotram"
+      />
+
+      {/* CARNATIC VOCALS LIVE ONLINE SESSIONS SPLIT MODAL */}
+      <CarnaticVocalsModal
+        isOpen={isCarnaticModalOpen}
+        onClose={() => setIsCarnaticModalOpen(false)}
       />
 
     </div>
