@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import anandImg from '/anand.jpeg';
 import { CarnaticVocalsModal } from './components/CarnaticVocalsModal';
+import { DeviAratiSpotlight } from './components/DeviAratiSpotlight';
+import { DeviAratiDetailsModal } from './components/DeviAratiDetailsModal';
+import { ShayanaAratiDetailsModal } from './components/ShayanaAratiDetailsModal';
+import { SoundaryaLahariDetailsModal } from './components/SoundaryaLahariDetailsModal';
 
 /* --- UTILS --- */
 const FadeIn = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
@@ -151,6 +155,7 @@ const HERO_SLIDES: HeroSlide[] = [
 
 interface OfferingProgram {
   id: string;
+  isVisible: boolean;
   image: string;
   sessionType: string;
   tags: string[];
@@ -164,6 +169,7 @@ interface OfferingProgram {
 const OFFERING_PROGRAMS: OfferingProgram[] = [
   {
     id: "guru-paduka-stotram",
+    isVisible: true,
     image: `${import.meta.env.BASE_URL}guru-paduka-stotram.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -174,17 +180,20 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
     paymentUrl: "https://rzp.io/rzp/guru-paduka-stotram",
   },
   {
-    id: "linga-bhairavi-shayan-arati",
+    id: "linga-bhairavi-shayana-arati",
+    isVisible: true,
     image: `${import.meta.env.BASE_URL}shayan-arati.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
-    title: "LINGA BHAIRAVI SHAYAN ARATI",
+    title: "LINGA BHAIRAVI SHAYANA ARATI",
     subtitle: "Lifetime Access",
     price: "INR 1500",
     buttonText: "EXPLORE PROGRAM",
+    paymentUrl: "https://rzp.io/rzp/linga-bhairavi-shayan-arati",
   },
   {
     id: "soundarya-lahari",
+    isVisible: true,
     image: `${import.meta.env.BASE_URL}soundarya-lahari.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -192,9 +201,11 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
     subtitle: "Lifetime Access",
     price: "INR 1500",
     buttonText: "EXPLORE PROGRAM",
+    paymentUrl: "https://rzp.io/rzp/soundarya-lahari",
   },
   {
     id: "gauranga",
+    isVisible: false,
     image: `${import.meta.env.BASE_URL}gauranga.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -205,6 +216,7 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
   },
   {
     id: "parvati-panchakam",
+    isVisible: false,
     image: `${import.meta.env.BASE_URL}parvati-panchakam.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -215,6 +227,7 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
   },
   {
     id: "nirvana-shatakam",
+    isVisible: false,
     image: `${import.meta.env.BASE_URL}nirvana-shatakam.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -225,6 +238,7 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
   },
   {
     id: "bhairavi-stavan",
+    isVisible: false,
     image: `${import.meta.env.BASE_URL}bhairavi-stavan.jpg`,
     sessionType: "RECORDED SESSION | 1 HR 30 MINS",
     tags: ["WORKSHOPS", "CHANTS"],
@@ -236,20 +250,38 @@ const OFFERING_PROGRAMS: OfferingProgram[] = [
 ];
 
 /* --- BEGIN YOUR JOURNEY: OFFERINGS CAROUSEL --- */
-const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => void }) => {
+const ChantMarqueeSection = ({
+  onOpenGuruPaduka,
+  onOpenDeviArati,
+  onOpenShayanaArati,
+  onOpenSoundaryaLahari,
+}: {
+  onOpenGuruPaduka: () => void;
+  onOpenDeviArati: () => void;
+  onOpenShayanaArati: () => void;
+  onOpenSoundaryaLahari: () => void;
+}) => {
+  const visiblePrograms = OFFERING_PROGRAMS.filter((program) => program.isVisible);
+  const isCarousel = visiblePrograms.length > 3;
+
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const checkScroll = () => {
     const el = trackRef.current;
-    if (!el) return;
+    if (!el || !isCarousel) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
     setCanScrollLeft(el.scrollLeft > 20);
     setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 20);
   };
 
   useEffect(() => {
     checkScroll();
+    if (!isCarousel) return;
     const el = trackRef.current;
     if (!el) return;
     el.addEventListener('scroll', checkScroll, { passive: true });
@@ -258,7 +290,7 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
       el.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
     };
-  }, []);
+  }, [isCarousel, visiblePrograms.length]);
 
   // Move smoothly to the next / previous set of cards
   const scrollToNextSet = (direction: 'left' | 'right') => {
@@ -274,10 +306,24 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
     });
   };
 
+  const trackContainerClass = isCarousel
+    ? "w-full overflow-x-auto scroll-smooth scrollbar-none pt-[38px] pb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] snap-x snap-mandatory flex gap-7 md:gap-8"
+    : visiblePrograms.length === 1
+      ? "w-full max-w-[380px] mx-auto pt-[38px] pb-6 flex justify-center"
+      : visiblePrograms.length === 2
+        ? "w-full max-w-[800px] mx-auto pt-[38px] pb-6 grid grid-cols-1 sm:grid-cols-2 gap-7 md:gap-8"
+        : "w-full pt-[38px] pb-6 flex flex-wrap justify-center lg:grid lg:grid-cols-3 gap-7 md:gap-8";
+
+  const cardSizeClass = isCarousel
+    ? "w-[310px] sm:w-[350px] md:w-[370px] shrink-0 snap-start"
+    : visiblePrograms.length === 3
+      ? "w-full max-w-[370px] sm:w-[320px] md:w-[340px] lg:w-full lg:max-w-none"
+      : "w-full max-w-[380px] mx-auto";
+
   return (
-    <div className="pt-24 md:pt-32 pb-16 md:pb-28 w-full relative z-10 select-none overflow-hidden">
+    <div className="pt-10 pb-16 md:pb-28 w-full relative z-10 select-none overflow-hidden">
       {/* Header Block */}
-      <div className="px-[6vw] md:px-[8vw] flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
+      <div className="px-[6vw] md:px-[8vw] flex flex-col md:flex-row justify-between items-start md:items-end mb-[34px] gap-8">
         <div className="max-w-2xl">
           <SectionLabel text="Programs & Offerings" color="text-[#B84A32] opacity-80" />
           <h2 className="font-['Playfair_Display'] font-medium text-4xl md:text-5xl text-zinc-900 leading-tight">
@@ -292,10 +338,13 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
         </div>
       </div>
 
-      {/* Cards Viewport with Floating Navigation Arrows */}
+      {/* Complimentary Welcome Gift: Linga Bhairavi Devi Arati Spotlight Banner */}
+      <DeviAratiSpotlight onExplore={onOpenDeviArati} />
+
+      {/* Cards Viewport with Floating Navigation Arrows (when carousel is active) */}
       <div className="relative w-full px-[6vw] md:px-[8vw] group/carousel">
         {/* Left Arrow Button (shown when user scrolled forward) */}
-        {canScrollLeft && (
+        {isCarousel && canScrollLeft && (
           <button
             onClick={() => scrollToNextSet('left')}
             aria-label="Previous set of cards"
@@ -305,15 +354,21 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
           </button>
         )}
 
-        {/* Scrollable Track - Static with generous spacing */}
+        {/* Centered Responsive Grid (<= 3 visible) or Scrollable Track (> 3 visible) */}
         <div 
           ref={trackRef}
-          className="w-full overflow-x-auto scroll-smooth scrollbar-none py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] snap-x snap-mandatory flex gap-7 md:gap-8"
+          className={trackContainerClass}
         >
-          {OFFERING_PROGRAMS.map((program) => {
+          {visiblePrograms.map((program) => {
             const isGuruPaduka =
               program.id === 'guru-paduka-stotram' ||
               program.title.trim().toLowerCase() === 'guru paduka stotram';
+            const isShayanaArati =
+              program.id === 'linga-bhairavi-shayana-arati' ||
+              program.title.trim().toLowerCase() === 'linga bhairavi shayana arati';
+            const isSoundaryaLahari =
+              program.id === 'soundarya-lahari' ||
+              program.title.trim().toLowerCase() === 'soundarya lahari';
 
             return (
               <div
@@ -323,11 +378,19 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
                     onOpenGuruPaduka();
                     return;
                   }
+                  if (isShayanaArati) {
+                    onOpenShayanaArati();
+                    return;
+                  }
+                  if (isSoundaryaLahari) {
+                    onOpenSoundaryaLahari();
+                    return;
+                  }
                   if (!(e.target as HTMLElement).closest('a')) {
                     e.currentTarget.querySelector('a')?.click();
                   }
                 }}
-                className="w-[310px] sm:w-[350px] md:w-[370px] shrink-0 snap-start bg-[#101724] border border-zinc-800/80 rounded-lg overflow-hidden flex flex-col justify-between shadow-[0_16px_40px_rgba(0,0,0,0.4)] hover:border-zinc-700 hover:shadow-[0_24px_55px_rgba(0,0,0,0.55)] transition-all duration-300 group cursor-pointer"
+                className={`${cardSizeClass} bg-[#101724] border border-zinc-800/80 rounded-lg overflow-hidden flex flex-col justify-between shadow-[0_16px_40px_rgba(0,0,0,0.4)] hover:border-zinc-700 hover:shadow-[0_24px_55px_rgba(0,0,0,0.55)] transition-all duration-300 group cursor-pointer`}
               >
                 <div>
                   {/* Top Image: Stately 4:3 Aspect Ratio */}
@@ -381,7 +444,7 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => {
-                    if (isGuruPaduka) {
+                    if (isGuruPaduka || isShayanaArati || isSoundaryaLahari) {
                       e.preventDefault();
                     }
                   }}
@@ -395,7 +458,7 @@ const ChantMarqueeSection = ({ onOpenGuruPaduka }: { onOpenGuruPaduka: () => voi
         </div>
 
         {/* Right Arrow Button */}
-        {canScrollRight && (
+        {isCarousel && canScrollRight && (
           <button
             onClick={() => scrollToNextSet('right')}
             aria-label="Next set of cards"
@@ -673,6 +736,9 @@ function App() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showGuruPadukaModal, setShowGuruPadukaModal] = useState(false);
+  const [showDeviAratiModal, setShowDeviAratiModal] = useState(false);
+  const [showShayanaAratiModal, setShowShayanaAratiModal] = useState(false);
+  const [showSoundaryaLahariModal, setShowSoundaryaLahariModal] = useState(false);
   const [isCarnaticModalOpen, setIsCarnaticModalOpen] = useState(false);
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const prefersReducedMotion = useReducedMotion();
@@ -894,13 +960,22 @@ function App() {
                   </motion.div>
                 </AnimatePresence>
 
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center justify-center rounded-full bg-[#F4B41A] hover:bg-[#EE8426] text-[#111215] font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase px-8 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4B41A]"
-                >
-                  EXPLORE PROGRAMS →
-                </button>
+                <div className="flex flex-wrap items-center gap-3.5 sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="inline-flex items-center justify-center rounded-full bg-[#F4B41A] hover:bg-[#EE8426] text-[#111215] font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase px-8 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4B41A]"
+                  >
+                    EXPLORE PROGRAMS →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('devi-arati-spotlight')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="inline-flex items-center justify-center rounded-full border border-[#C89B54]/75 bg-white/[0.03] hover:bg-[#C89B54]/15 hover:border-[#F4B41A] text-[#FCE8B8] hover:text-white font-['Montserrat',sans-serif] font-bold text-[13.5px] tracking-[0.12em] uppercase px-7 py-4 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C89B54]"
+                  >
+                    FREE DEVI ARATI
+                  </button>
+                </div>
 
                 {/* Subtle Slide Indicator Dashes */}
                 <div className="mt-10 flex items-center gap-2.5" role="tablist" aria-label="Hero slides">
@@ -1086,8 +1161,13 @@ function App() {
       <ThemeSection id="programs-section" bgClass="bg-[#F3EFEA] text-zinc-900 relative z-10 -mt-12 md:-mt-16 pt-12 md:pt-16" theme="light" setActiveTheme={setActiveTheme}>
         <div className="mandala-mask z-0 opacity-5"></div>
         
-        {/* Option 1: Gentle Continuous Auto-Scroll (Infinite Ambient Marquee) */}
-        <ChantMarqueeSection onOpenGuruPaduka={() => setShowGuruPadukaModal(true)} />
+        {/* Programs & Offerings: Header -> Devi Arati Spotlight -> Recorded Chants Grid */}
+        <ChantMarqueeSection
+          onOpenGuruPaduka={() => setShowGuruPadukaModal(true)}
+          onOpenDeviArati={() => setShowDeviAratiModal(true)}
+          onOpenShayanaArati={() => setShowShayanaAratiModal(true)}
+          onOpenSoundaryaLahari={() => setShowSoundaryaLahariModal(true)}
+        />
 
         {/* Carnatic Vocals Part with Parchment Texture & Angular Transition */}
         <div className="relative w-full overflow-hidden">
@@ -1314,6 +1394,27 @@ function App() {
         isOpen={showGuruPadukaModal}
         onClose={() => setShowGuruPadukaModal(false)}
         paymentUrl="https://rzp.io/rzp/guru-paduka-stotram"
+      />
+
+      {/* LINGA BHAIRAVI DEVI ARATI PROGRAM DETAILS MODAL */}
+      <DeviAratiDetailsModal
+        isOpen={showDeviAratiModal}
+        onClose={() => setShowDeviAratiModal(false)}
+        paymentUrl="https://rzp.io/rzp/linga-bhairavi-devi-arati"
+      />
+
+      {/* LINGA BHAIRAVI SHAYANA ARATI PROGRAM DETAILS MODAL */}
+      <ShayanaAratiDetailsModal
+        isOpen={showShayanaAratiModal}
+        onClose={() => setShowShayanaAratiModal(false)}
+        paymentUrl="https://rzp.io/rzp/linga-bhairavi-shayan-arati"
+      />
+
+      {/* SOUNDARYA LAHARI PROGRAM DETAILS MODAL */}
+      <SoundaryaLahariDetailsModal
+        isOpen={showSoundaryaLahariModal}
+        onClose={() => setShowSoundaryaLahariModal(false)}
+        paymentUrl="https://rzp.io/rzp/soundarya-lahari"
       />
 
       {/* CARNATIC VOCALS LIVE ONLINE SESSIONS SPLIT MODAL */}
