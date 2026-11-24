@@ -271,7 +271,7 @@ const PURCHASED_PROGRAMS: Record<
   },
   'soundarya-lahari': {
     title: 'Soundarya Lahari',
-    videoUrl: '',
+    videoUrl: 'https://www.youtube.com/watch?v=p9juebYYdao',
     whatsappUrl: 'https://chat.whatsapp.com/YOUR_COMMUNITY_LINK',
   },
 };
